@@ -62,7 +62,7 @@ public class Particle {
 	 * @return time to collide
 	 */
 	public static double timeToCollideVerticalWall(double xl, double xr, Particle p){
-		if(p.velocity.x>0){
+		if(p.velocity.x>=0){
 			return (xr-p.radius-p.position.x) / p.velocity.x;
 		}else{
 			return (xl+p.radius-p.position.x) / p.velocity.x;
@@ -77,7 +77,7 @@ public class Particle {
 	 * @return time to collide
 	 */
 	public static double timeToCollideHorizontalWall(double yb, double yt, Particle p){
-		if(p.velocity.y>0){
+		if(p.velocity.y>=0){
 			return (yt-p.radius-p.position.y) / p.velocity.y;
 		}else{
 			return (yb+p.radius-p.position.y) / p.velocity.y;
@@ -90,14 +90,14 @@ public class Particle {
 		double sigma = p.radius+q.radius;
 		double prodVR = Point.scalarProd(deltaV, deltaR);
 		double prodVV = Point.scalarProd(deltaV, deltaV);
-		double prodRRsigma = Point.scalarProd(deltaR, deltaR) - sigma; 
+		double prodRRsigma = Point.scalarProd(deltaR, deltaR) - Math.pow(sigma, 2); 
 		
 		double d = 
 			Math.pow(prodVR, 2) -
 			prodVV *
 			prodRRsigma;
 		
-		if( d<0 || prodVR>=0 ){
+		if( d < 0 || prodVR >= 0 ){
 			return Double.POSITIVE_INFINITY;
 		}else{
 			return - (prodVR + Math.sqrt(d)) / (prodVV);
@@ -118,8 +118,8 @@ public class Particle {
 	public static void particlesCollide(Particle p, Particle q){
 		double deltaX = p.position.x - q.position.x;
 		double deltaY = p.position.y - q.position.y;
-		Point deltaR = Point.sub(p.position, q.position).clone();
-		Point deltaV = Point.sub(p.velocity, q.velocity).clone();
+		Point deltaR = Point.sub(p.position, q.position);
+		Point deltaV = Point.sub(p.velocity, q.velocity);
 		double sigma = p.radius+q.radius;
 		double prodVR = Point.scalarProd(deltaV, deltaR);
 		double j = 

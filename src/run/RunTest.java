@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Particle;
+import utils.OutputFileGenerator;
 import utils.RandomUtils;
 
 public class RunTest {
@@ -20,24 +21,32 @@ public class RunTest {
 	private final double minV = -0.1;
 	private final double maxV = 0.1;
 	private final int maxErrors = 5;
+	private final int fps = 60;
+	private final double deltaTime;
 	
 	private double time;
 	
 	public RunTest(){
+		deltaTime = 1.0 / fps;
+		RandomUtils.setSeed(1234);
+		OutputFileGenerator outputFileGenerator = new OutputFileGenerator("animation/","state");
 		List<Particle> particles = createParticles();
 		time = 0;
 		int N = particles.size();
+		System.out.println(N);
 		double dt;
 		double auxTime;
 		Particle collider = null;
 		Particle toCollide = null;
 		boolean verticalWallCollide = false;
 		boolean horizontalWallCollide = false;
-		while(time < 5){
+		double lastTime = 0;
+		outputFileGenerator.printState(particles);
+		while(time < 10){
 			dt = Double.MAX_VALUE;
 			for(int i = 0; i < N; i++){
 				Particle p = particles.get(i);
-				auxTime = Particle.timeToCollideHorizontalWall(0, L, p); 
+				auxTime = Particle.timeToCollideHorizontalWall(0, L, p);
 				if(auxTime < dt){
 					dt = auxTime;
 					collider = p;
@@ -45,7 +54,7 @@ public class RunTest {
 					horizontalWallCollide = true;
 					verticalWallCollide = false;
 				}
-				auxTime = Particle.timeToCollideVerticalWall(0, L, p); 
+				auxTime = Particle.timeToCollideVerticalWall(0, L, p);
 				if(auxTime < dt){
 					dt = auxTime;
 					collider = p;
@@ -55,7 +64,7 @@ public class RunTest {
 				}
 				for(int j = i+1; j < N; j++){
 					Particle q = particles.get(j);
-					auxTime = Particle.timeToCollide(p, q); 
+					auxTime = Particle.timeToCollide(p, q);
 					if(auxTime < dt){
 						dt = auxTime;
 						collider = p;
@@ -64,6 +73,11 @@ public class RunTest {
 						verticalWallCollide = false;
 					}					
 				}				
+			}
+			if(time+dt>lastTime+deltaTime){
+				outputFileGenerator.printState(particles);
+				lastTime = time;
+				System.out.println(time);
 			}
 			time += dt;
 			for(Particle p : particles){
