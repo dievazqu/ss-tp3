@@ -44,7 +44,13 @@ public class Particle {
 		return radius;
 	}
 	
-	public static boolean areOverlap(Particle p, Particle q){
+	public void move(double time){
+		Point deltaPosition = velocity.clone();
+		deltaPosition.applyFunction(v->v*time);
+		position.add(deltaPosition);
+	}
+	
+	public static boolean areOverlapped(Particle p, Particle q){
 		return Math.pow(p.position.x-q.position.x, 2) + Math.pow(p.position.y-q.position.y, 2) <= Math.pow(p.radius+q.radius,2);
 	}
 	
