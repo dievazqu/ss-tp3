@@ -5,6 +5,7 @@ import java.util.List;
 
 import model.Particle;
 import utils.OutputFileGenerator;
+import utils.OutputXYZFilesGenerator;
 import utils.RandomUtils;
 
 public class RunTest {
@@ -12,7 +13,7 @@ public class RunTest {
 	public static void main(String[] args) {
 		new RunTest();
 	}
-	
+
 	private final double bigRadius = 0.05;
 	private final double smallRadius = 0.005;
 	private final double bigMass = 0.1;
@@ -25,11 +26,12 @@ public class RunTest {
 	private final double deltaTime;
 	
 	private double time;
-	
-	public RunTest(){
+
+	public RunTest() {
 		deltaTime = 1.0 / fps;
 		RandomUtils.setSeed(1234);
-		OutputFileGenerator outputFileGenerator = new OutputFileGenerator("animation/","state");
+		OutputXYZFilesGenerator outputXYZFilesGenerator = new OutputXYZFilesGenerator("animation/", "state");
+		OutputFileGenerator outputFileGenerator = new OutputFileGenerator("animation/", "output");
 		List<Particle> particles = createParticles();
 		time = 0;
 		int N = particles.size();
@@ -41,13 +43,15 @@ public class RunTest {
 		boolean verticalWallCollide = false;
 		boolean horizontalWallCollide = false;
 		double lastTime = 0;
-		outputFileGenerator.printState(particles);
-		while(time < 10){
+		outputXYZFilesGenerator.printState(particles);
+		int frame = 1;
+		calculateK(particles, frame++);
+		while (time < 10) {
 			dt = Double.MAX_VALUE;
-			for(int i = 0; i < N; i++){
+			for (int i = 0; i < N; i++) {
 				Particle p = particles.get(i);
 				auxTime = Particle.timeToCollideHorizontalWall(0, L, p);
-				if(auxTime < dt){
+				if (auxTime < dt) {
 					dt = auxTime;
 					collider = p;
 					toCollide = null;
@@ -55,79 +59,73 @@ public class RunTest {
 					verticalWallCollide = false;
 				}
 				auxTime = Particle.timeToCollideVerticalWall(0, L, p);
-				if(auxTime < dt){
+				if (auxTime < dt) {
 					dt = auxTime;
 					collider = p;
 					toCollide = null;
 					horizontalWallCollide = false;
 					verticalWallCollide = true;
 				}
-				for(int j = i+1; j < N; j++){
+				for (int j = i + 1; j < N; j++) {
 					Particle q = particles.get(j);
 					auxTime = Particle.timeToCollide(p, q);
-					if(auxTime < dt){
+					if (auxTime < dt) {
 						dt = auxTime;
 						collider = p;
 						toCollide = q;
 						horizontalWallCollide = false;
 						verticalWallCollide = false;
-					}					
-				}				
+					}
+				}
 			}
-			if(time+dt>lastTime+deltaTime){
-				outputFileGenerator.printState(particles);
+			if (time + dt > lastTime + deltaTime) {
+				outputXYZFilesGenerator.printState(particles);
+				calculateK(particles, frame++);
 				lastTime = time;
 				System.out.println(time);
 			}
 			time += dt;
-			for(Particle p : particles){
+			for (Particle p : particles) {
 				p.move(dt);
 			}
-			if(toCollide==null){
-				if(horizontalWallCollide){
+			if (toCollide == null) {
+				if (horizontalWallCollide) {
 					Particle.horizontalWallCollide(collider);
 				}
-				if(verticalWallCollide){
+				if (verticalWallCollide) {
 					Particle.verticalWallCollide(collider);
 				}
-			}else{
+			} else {
 				Particle.particlesCollide(collider, toCollide);
+				outputFileGenerator.addLine(Double.toString(time));
 			}
 		}
+		
+		outputFileGenerator.writeFile();
 	}
-	
-	public List<Particle> createParticles(){
+
+	public List<Particle> createParticles() {
 		List<Particle> particles = new ArrayList<Particle>();
+		// The particle with id 1 is the one with a big mass
 		int id = 1;
-		Particle bigParticle = new Particle(
-			id++, 
-			RandomUtils.getRandomDouble(bigRadius, L-bigRadius),
-			RandomUtils.getRandomDouble(bigRadius, L-bigRadius),
-			0,
-			0,
-			bigMass,
-			bigRadius);
+		Particle bigParticle = new Particle(id++, RandomUtils.getRandomDouble(bigRadius, L - bigRadius),
+				RandomUtils.getRandomDouble(bigRadius, L - bigRadius), 0, 0, bigMass, bigRadius);
 		particles.add(bigParticle);
 		int errors = 0;
-		while(errors < maxErrors){
-			Particle smallParticle = new Particle(
-					id, 
-					RandomUtils.getRandomDouble(smallRadius, L-smallRadius),
-					RandomUtils.getRandomDouble(smallRadius, L-smallRadius),
-					RandomUtils.getRandomDouble(minV, maxV),
-					RandomUtils.getRandomDouble(minV, maxV),
-					smallMass,
-					smallRadius);
+		while (errors < maxErrors) {
+			Particle smallParticle = new Particle(id, RandomUtils.getRandomDouble(smallRadius, L - smallRadius),
+					RandomUtils.getRandomDouble(smallRadius, L - smallRadius), RandomUtils.getRandomDouble(minV, maxV),
+					RandomUtils.getRandomDouble(minV, maxV), smallMass, smallRadius);
 			boolean areOverlapped = false;
-			for(Particle p : particles){
-				if(Particle.areOverlapped(smallParticle, p)){
+			for (Particle p : particles) {
+				if (Particle.areOverlapped(smallParticle, p)) {
 					areOverlapped = true;
 					break;
 				}
 			}
-			if(areOverlapped){
+			if (areOverlapped) {
 				errors++;
-			}else{
+			} else {
 				errors = 0;
 				id++;
 				particles.add(smallParticle);
@@ -135,4 +133,13 @@ public class RunTest {
 		}
 		return particles;
 	}
+
+	public void calculateK(List<Particle> particles, int frame) {
+		double K = 0.0;
+		for (Particle p : particles) {
+			K += p.getMass() * Math.pow(p.getSpeed(), 2);
+		}
+		System.out.println("frame " + frame + ": " + K);
+	}
+
 }

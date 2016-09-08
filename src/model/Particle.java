@@ -134,4 +134,8 @@ public class Particle {
 		q.velocity.x += jx/q.mass;
 		q.velocity.y += jy/q.mass;
 	}
+
+	public double getSpeed() {
+		return Math.sqrt(Math.pow(this.getXVelocity(),2) + Math.pow(this.getYVelocity(),2));
+	}
 }
