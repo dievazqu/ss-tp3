@@ -8,28 +8,43 @@ import utils.OutputFileGenerator;
 import utils.OutputXYZFilesGenerator;
 import utils.RandomUtils;
 
-public class RunTest {
-
-	public static void main(String[] args) {
-		new RunTest();
+public class BrownionMotion {
+	
+	public BrownionMotion(double bigRadius, double smallRadius, double bigMass, double smallMass, double l, double minV,
+			double maxV, int maxErrors, int fps, int seed, boolean print) {
+		super();
+		this.bigRadius = bigRadius;
+		this.smallRadius = smallRadius;
+		this.bigMass = bigMass;
+		this.smallMass = smallMass;
+		L = l;
+		this.minV = minV;
+		this.maxV = maxV;
+		this.maxErrors = maxErrors;
+		this.fps = fps;
+		deltaTime = 1.0 / fps;
+		RandomUtils.setSeed(seed);
+		this.run();
 	}
 
-	private final double bigRadius = 0.05;
-	private final double smallRadius = 0.005;
-	private final double bigMass = 0.1;
-	private final double smallMass = 0.0001;
-	private final double L = 0.5;
-	private final double minV = -0.1;
-	private final double maxV = 0.1;
-	private final int maxErrors = 5;
-	private final int fps = 60;
+	public static void main(String[] args) {
+		new BrownionMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 1234, false);
+	}
+	
+	private final double bigRadius;
+	private final double smallRadius;
+	private final double bigMass;
+	private final double smallMass;
+	private final double L;
+	private final double minV;
+	private final double maxV;
+	private final int maxErrors;
+	private final int fps;
 	private final double deltaTime;
 	
 	private double time;
 
-	public RunTest() {
-		deltaTime = 1.0 / fps;
-		RandomUtils.setSeed(1234);
+	public void run() {
 		OutputXYZFilesGenerator outputXYZFilesGenerator = new OutputXYZFilesGenerator("animation/", "state");
 		OutputFileGenerator outputFileGenerator = new OutputFileGenerator("animation/", "output");
 		List<Particle> particles = createParticles();
