@@ -23,6 +23,7 @@ public class BrownionMotion {
 		this.maxErrors = maxErrors;
 		this.fps = fps;
 		deltaTime = 1.0 / fps;
+		printOutput = print; 
 		RandomUtils.setSeed(seed);
 		this.run();
 	}
@@ -41,6 +42,7 @@ public class BrownionMotion {
 	private final int maxErrors;
 	private final int fps;
 	private final double deltaTime;
+	private final boolean printOutput;
 	
 	private double time;
 
@@ -58,7 +60,9 @@ public class BrownionMotion {
 		boolean verticalWallCollide = false;
 		boolean horizontalWallCollide = false;
 		double lastTime = 0;
-		outputXYZFilesGenerator.printState(particles);
+		if (printOutput) {
+			outputXYZFilesGenerator.printState(particles);	
+		}
 		int frame = 1;
 		calculateK(particles, frame++);
 		while (time < 10) {
@@ -94,7 +98,9 @@ public class BrownionMotion {
 				}
 			}
 			if (time + dt > lastTime + deltaTime) {
-				outputXYZFilesGenerator.printState(particles);
+				if (printOutput) {
+					outputXYZFilesGenerator.printState(particles);
+				}
 				calculateK(particles, frame++);
 				lastTime = time;
 				System.out.println(time);
@@ -112,11 +118,14 @@ public class BrownionMotion {
 				}
 			} else {
 				Particle.particlesCollide(collider, toCollide);
-				outputFileGenerator.addLine(Double.toString(time));
+				if (printOutput) {
+					outputFileGenerator.addLine(Double.toString(time));
+				}
 			}
 		}
-		
-		outputFileGenerator.writeFile();
+		if (printOutput) {
+			outputFileGenerator.writeFile();
+		}
 	}
 
 	public List<Particle> createParticles() {
