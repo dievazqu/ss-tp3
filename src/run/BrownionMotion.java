@@ -11,7 +11,7 @@ import utils.RandomUtils;
 public class BrownionMotion {
 	
 	public BrownionMotion(double bigRadius, double smallRadius, double bigMass, double smallMass, double l, double minV,
-			double maxV, int maxErrors, int fps, int seed, boolean print) {
+			double maxV, int maxErrors, int fps, int seed, boolean print, int N) {
 		super();
 		this.bigRadius = bigRadius;
 		this.smallRadius = smallRadius;
@@ -25,11 +25,14 @@ public class BrownionMotion {
 		deltaTime = 1.0 / fps;
 		printOutput = print; 
 		RandomUtils.setSeed(seed);
+		this.N = N;
 		this.run();
 	}
 
 	public static void main(String[] args) {
-		new BrownionMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 1234, false);
+ 		for(int i = 0; i < 10000; i++) {
+ 			new BrownionMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, i, false, 312);	
+ 		}
 	}
 	
 	private final double bigRadius;
@@ -43,13 +46,14 @@ public class BrownionMotion {
 	private final int fps;
 	private final double deltaTime;
 	private final boolean printOutput;
+	private final int N;
 	
 	private double time;
 
 	public void run() {
 		OutputXYZFilesGenerator outputXYZFilesGenerator = new OutputXYZFilesGenerator("animation/", "state");
 		OutputFileGenerator outputFileGenerator = new OutputFileGenerator("animation/", "output");
-		List<Particle> particles = createParticles();
+		List<Particle> particles = createParticles(N, false);
 		time = 0;
 		int N = particles.size();
 		System.out.println(N);
@@ -65,7 +69,7 @@ public class BrownionMotion {
 		}
 		int frame = 1;
 		calculateK(particles, frame++);
-		while (time < 10) {
+		while (time < 40) {
 			dt = Double.MAX_VALUE;
 			for (int i = 0; i < N; i++) {
 				Particle p = particles.get(i);
@@ -128,6 +132,38 @@ public class BrownionMotion {
 		}
 	}
 
+	public List<Particle> createParticles(int N, boolean centerBigParticle) {
+		List<Particle> particles = new ArrayList<Particle>();
+		// The particle with id 1 is the one with a big mass
+		int id = 1;
+		Particle bigParticle;
+		if (centerBigParticle) {
+			bigParticle = new Particle(id++, L/2, L/2, 0, 0, bigMass, bigRadius);
+		} else {
+			bigParticle = new Particle(id++, RandomUtils.getRandomDouble(bigRadius, L - bigRadius),
+					RandomUtils.getRandomDouble(bigRadius, L - bigRadius), 0, 0, bigMass, bigRadius);	
+		}
+		particles.add(bigParticle);
+		
+		while(particles.size() < N) {
+			Particle smallParticle = new Particle(id, RandomUtils.getRandomDouble(smallRadius, L - smallRadius),
+					RandomUtils.getRandomDouble(smallRadius, L - smallRadius), RandomUtils.getRandomDouble(minV, maxV),
+					RandomUtils.getRandomDouble(minV, maxV), smallMass, smallRadius);
+			boolean areOverlapped = false;
+			for (Particle p : particles) {
+				if (Particle.areOverlapped(smallParticle, p)) {
+					areOverlapped = true;
+					break;
+				}
+			}
+			if (!areOverlapped) {
+				id++;
+				particles.add(smallParticle);	
+			}
+		}
+		return particles;
+	}
+	
 	public List<Particle> createParticles() {
 		List<Particle> particles = new ArrayList<Particle>();
 		// The particle with id 1 is the one with a big mass
