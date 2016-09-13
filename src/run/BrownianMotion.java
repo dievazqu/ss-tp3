@@ -8,9 +8,9 @@ import utils.OutputFileGenerator;
 import utils.OutputXYZFilesGenerator;
 import utils.RandomUtils;
 
-public class BrownionMotion {
+public class BrownianMotion {
 	
-	public BrownionMotion(double bigRadius, double smallRadius, double bigMass, double smallMass, double l, double minV,
+	public BrownianMotion(double bigRadius, double smallRadius, double bigMass, double smallMass, double l, double minV,
 			double maxV, int maxErrors, int fps, int seed, boolean print, int N) {
 		super();
 		this.bigRadius = bigRadius;
@@ -34,7 +34,7 @@ public class BrownionMotion {
 
 	public static void main(String[] args) {
 		stats = new Statistics();
- 		new BrownionMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 23456, false, 400);
+ 		new BrownianMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 23456, false, 400);
  		stats.printStats();
 	}
 	
