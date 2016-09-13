@@ -136,6 +136,6 @@ public class Particle {
 	}
 
 	public double getSpeed() {
-		return Math.sqrt(Math.pow(this.getXVelocity(),2) + Math.pow(this.getYVelocity(),2));
+		return velocity.abs();
 	}
 }
