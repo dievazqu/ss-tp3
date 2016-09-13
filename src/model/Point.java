@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 public class Point {
 
-	static final double EPSILON = 1e-5;
+	static final double EPSILON = 1e-7;
 	public double x, y;
 	
 	public Point(double x, double y){

@@ -17,7 +17,7 @@ public class OutputXYZFilesGenerator {
 	private String path;
 	private final String RED = "1 0 0";
 	private final String BLUE = "0 0 1";
-	private double maxSpeed = 0.3;
+	private double maxSpeed = 0.2;
 
 	public OutputXYZFilesGenerator(String directory, String file) {
 		frameNumber = 0;

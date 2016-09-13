@@ -10,6 +10,11 @@ import utils.RandomUtils;
 
 public class BrownianMotion {
 	
+	public static void main(String[] args) {
+ 		new BrownianMotion(0.05, 0.005, 0.1, 0.0001, 0.5, 0, 0.1, 5, 60, 23456, true, 300);
+ 		//new BrownianMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 23456, true, 200);
+	}
+	
 	public BrownianMotion(double bigRadius, double smallRadius, double bigMass, double smallMass, double l, double minV,
 			double maxV, int maxErrors, int fps, int seed, boolean print, int N) {
 		super();
@@ -21,7 +26,6 @@ public class BrownianMotion {
 		this.minV = minV;
 		this.maxV = maxV;
 		this.maxErrors = maxErrors;
-		this.fps = fps;
 		deltaTime = 1.0 / fps;
 		printOutput = print; 
 		this.seed = seed;
@@ -32,14 +36,7 @@ public class BrownianMotion {
 	
 	public static Statistics stats;
 
-	public static void main(String[] args) {
-//		for(int i=0 ; i<28 ; i++) {
-			stats = new Statistics();
-	 		new BrownianMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 4*14, true, 400);
-//	 		stats.printStats();
-//		}
- 		
-	}
+	
 	
 	private final double bigRadius;
 	private final double smallRadius;
@@ -49,11 +46,11 @@ public class BrownianMotion {
 	private final double minV;
 	private final double maxV;
 	private final int maxErrors;
-	private final int fps;
 	private final double deltaTime;
 	private final boolean printOutput;
 	private final int N;
 	private final int seed;
+	private final double maxTime = 40.0;
 	
 	
 	private double time;
@@ -61,11 +58,10 @@ public class BrownianMotion {
 	public void run() {
 		double speedMax = 0.0;
 		OutputXYZFilesGenerator outputXYZFilesGenerator = new OutputXYZFilesGenerator("animation/", "state");
-	//	OutputFileGenerator outputFileGenerator = new OutputFileGenerator("animation/", "output"+seed);
 		List<Particle> particles = createParticles(N, false);
 		time = 0;
 		int N = particles.size();
-		System.out.println(N);
+		System.out.println("N: "+N);
 		double dt;
 		double auxTime;
 		Particle collider = null;
@@ -76,9 +72,8 @@ public class BrownianMotion {
 		if (printOutput) {
 			outputXYZFilesGenerator.printState(particles);	
 		}
-		int frame = 1;
-		calculateK(particles, frame++);
-		while (time < 40) {
+		System.out.println("K: "+calculateK(particles));
+		while (time < maxTime) {
 			dt = Double.MAX_VALUE;
 			for (int i = 0; i < N; i++) {
 				Particle p = particles.get(i);
@@ -115,9 +110,8 @@ public class BrownianMotion {
 				if (printOutput) {
 					outputXYZFilesGenerator.printState(particles);
 				}
-				calculateK(particles, frame++);
 				lastTime = time;
-			//	System.out.println(time);
+					
 			}
 			time += dt;
 			for (Particle p : particles) {
@@ -132,12 +126,8 @@ public class BrownianMotion {
 				}
 			} else {
 				Particle.particlesCollide(collider, toCollide);
-//				stats.adddt(dt);
-			//	outputFileGenerator.addLine(Double.toString(time));
 			}
 		}
-		//outputFileGenerator.writeFile();
-		System.out.println(speedMax);
 	}
 
 	public List<Particle> createParticles(int N, boolean centerBigParticle) {
@@ -146,16 +136,16 @@ public class BrownianMotion {
 		int id = 1;
 		Particle bigParticle;
 		if (centerBigParticle) {
-			bigParticle = new Particle(id++, L/2, L/2, 0, 0, bigMass, bigRadius);
+			bigParticle = new Particle(id++, L/2, L/2, 0, bigMass, bigRadius);
 		} else {
 			bigParticle = new Particle(id++, RandomUtils.getRandomDouble(bigRadius, L - bigRadius),
-					RandomUtils.getRandomDouble(bigRadius, L - bigRadius), 0, 0, bigMass, bigRadius);	
+					RandomUtils.getRandomDouble(bigRadius, L - bigRadius), 0, bigMass, bigRadius);	
 		}
 		particles.add(bigParticle);
 		
 		while(particles.size() < N) {
 			Particle smallParticle = new Particle(id, RandomUtils.getRandomDouble(smallRadius, L - smallRadius),
-					RandomUtils.getRandomDouble(smallRadius, L - smallRadius), RandomUtils.getRandomDouble(minV, maxV),
+					RandomUtils.getRandomDouble(smallRadius, L - smallRadius),
 					RandomUtils.getRandomDouble(minV, maxV), smallMass, smallRadius);
 			boolean areOverlapped = false;
 			for (Particle p : particles) {
@@ -202,12 +192,12 @@ public class BrownianMotion {
 		return particles;
 	}
 
-	public void calculateK(List<Particle> particles, int frame) {
+	public double calculateK(List<Particle> particles) {
 		double K = 0.0;
 		for (Particle p : particles) {
 			K += p.getMass() * Math.pow(p.getSpeed(), 2);
 		}
-//		System.out.println("frame " + frame + ": " + K);
+		return 0.5*K;
 	}
 
 }

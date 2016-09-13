@@ -1,5 +1,7 @@
 package model;
 
+import utils.RandomUtils;
+
 public class Particle {
 
 	private int id;
@@ -12,6 +14,15 @@ public class Particle {
 		this.id = id;
 		this.position = new Point(x, y);
 		this.velocity = new Point(vx, vy);
+		this.mass = m;
+		this.radius = r;
+	}
+	
+	public Particle(int id, double x, double y, double velAbs, double m, double r) {
+		this.id = id;
+		this.position = new Point(x, y);
+		double angle = RandomUtils.getRandomDouble(0, 2*Math.PI);
+		this.velocity = new Point(velAbs * Math.cos(angle), velAbs * Math.sin(angle));
 		this.mass = m;
 		this.radius = r;
 	}
@@ -62,6 +73,9 @@ public class Particle {
 	 * @return time to collide
 	 */
 	public static double timeToCollideVerticalWall(double xl, double xr, Particle p){
+		if(Math.abs(p.velocity.x)<Point.EPSILON){
+			return Double.POSITIVE_INFINITY;
+		}
 		if(p.velocity.x>=0){
 			return (xr-p.radius-p.position.x) / p.velocity.x;
 		}else{
@@ -77,6 +91,9 @@ public class Particle {
 	 * @return time to collide
 	 */
 	public static double timeToCollideHorizontalWall(double yb, double yt, Particle p){
+		if(Math.abs(p.velocity.y)<Point.EPSILON){
+			return Double.POSITIVE_INFINITY;
+		}
 		if(p.velocity.y>=0){
 			return (yt-p.radius-p.position.y) / p.velocity.y;
 		}else{

@@ -8,23 +8,40 @@ import java.util.List;
 
 public class Statistics {
 
-	private List<Double> dts;
+	private List<Double> speeds1;
+	private List<Double> speeds2;
 	
 	public Statistics() {
-		dts = new LinkedList<Double>();
+		speeds1 = new LinkedList<Double>();
+		speeds2 = new LinkedList<Double>();
 	}
 	
-	public void adddt(Double dt){
-		dts.add(dt);
+	public void addSpeed1(Double speed){
+		speeds1.add(speed);
+	}
+	
+	public void addSpeed2(Double speed){
+		speeds2.add(speed);
 	}
 	
 	public void printStats(){
 		try{
-			File file = new File("stats");
+			File file = new File("stats1");
 			OutputStream fos = new FileOutputStream(file);
-			fos.write(((dts.size()/40.0)+"\n").replace(".", ",").getBytes());
-			fos.write((dts.stream().mapToDouble(a->a).average().getAsDouble()+"\n").replace(".", ",").getBytes());
-			dts.stream().forEach(a->{
+			speeds1.stream().forEach(a->{
+			try{
+				fos.write((a+"\n").replace(".", ",").getBytes());
+			}catch(Exception e){
+				e.printStackTrace();
+			}}
+			);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		try{
+			File file = new File("stats2");
+			OutputStream fos = new FileOutputStream(file);
+			speeds2.stream().forEach(a->{
 			try{
 				fos.write((a+"\n").replace(".", ",").getBytes());
 			}catch(Exception e){
