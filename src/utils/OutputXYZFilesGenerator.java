@@ -32,24 +32,24 @@ public class OutputXYZFilesGenerator {
 	public void printState(List<Particle> particles){
 		List<String> lines = new LinkedList<String>();
 		lines.add(String.valueOf(particles.size()));
-		lines.add("ParticleId xCoordinate yCoordinate xDisplacement yDisplacement Radius R G B Transparency");
-		lines.add("0 0 0 0 0 0 0 0 0 1");
-		lines.add("0 0.5 0 0 0 0 0 0 0 1");
-		lines.add("0 0 0.5 0 0 0 0 0 0 1");
-		lines.add("0 0.5 0.5 0 0 0 0 0 0 1");
+		lines.add("ParticleId xCoordinate yCoordinate xDisplacement yDisplacement Radius R G B Transparency Selection");
+		lines.add("0 0 0 0 0 0 0 0 0 1 0");
+		lines.add("0 0.5 0 0 0 0 0 0 0 1 0");
+		lines.add("0 0 0.5 0 0 0 0 0 0 1 0");
+		lines.add("0 0.5 0.5 0 0 0 0 0 0 1 0");
 		for(Particle p : particles){
 			if (p.getId() == 1) {
-				lines.add(getInfo(p, RED));
+				lines.add(getInfo(p, RED, 1));
 			} else {
-				lines.add(getInfo(p, BLUE));
+				lines.add(getInfo(p, BLUE, 0));
 			}
 				
 		}
 		writeFile(lines);
 	}
 	
-	private String getInfo(Particle p, String color) {
-		return p.getId()+" "+p.getX()+" "+p.getY()+" "+p.getXVelocity()+" "+p.getYVelocity()+" "+p.getRadius()+" "+color+" 0";
+	private String getInfo(Particle p, String color, int selection) {
+		return p.getId()+" "+p.getX()+" "+p.getY()+" "+p.getXVelocity()+" "+p.getYVelocity()+" "+p.getRadius()+" "+color+" 0 "+selection;
 	}
 
 
