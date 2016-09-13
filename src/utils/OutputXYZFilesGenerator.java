@@ -17,19 +17,19 @@ public class OutputXYZFilesGenerator {
 	private String path;
 	private final String RED = "1 0 0";
 	private final String BLUE = "0 0 1";
-	
-	public OutputXYZFilesGenerator(String directory, String file){
+	private double maxSpeed = 0.3;
+
+	public OutputXYZFilesGenerator(String directory, String file) {
 		frameNumber = 0;
-		this.path = directory+file;
-		try{
+		this.path = directory + file;
+		try {
 			Files.createDirectories(Paths.get(directory));
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-		
-	public void printState(List<Particle> particles){
+
+	public void printState(List<Particle> particles) {
 		List<String> lines = new LinkedList<String>();
 		lines.add(String.valueOf(particles.size()));
 		lines.add("ParticleId xCoordinate yCoordinate xDisplacement yDisplacement Radius R G B Transparency Selection");
@@ -37,24 +37,27 @@ public class OutputXYZFilesGenerator {
 		lines.add("0 0.5 0 0 0 0 0 0 0 1 0");
 		lines.add("0 0 0.5 0 0 0 0 0 0 1 0");
 		lines.add("0 0.5 0.5 0 0 0 0 0 0 1 0");
-		for(Particle p : particles){
+		for (Particle p : particles) {
 			if (p.getId() == 1) {
-				lines.add(getInfo(p, RED, 1));
+				lines.add(getInfo(p, "1 " + getGreen(p) + " 0", 1));
 			} else {
-				lines.add(getInfo(p, BLUE, 0));
+				lines.add(getInfo(p, "0 " + getGreen(p) + " 1", 0));
 			}
-				
 		}
 		writeFile(lines);
 	}
-	
-	private String getInfo(Particle p, String color, int selection) {
-		return p.getId()+" "+p.getX()+" "+p.getY()+" "+p.getXVelocity()+" "+p.getYVelocity()+" "+p.getRadius()+" "+color+" 0 "+selection;
+
+	private String getGreen(Particle p) {
+		return Double.toString(p.getSpeed()/maxSpeed);
 	}
 
+	private String getInfo(Particle p, String color, int selection) {
+		return p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getXVelocity() + " " + p.getYVelocity() + " "
+				+ p.getRadius() + " " + color + " 0.5 " + selection;
+	}
 
-	private void writeFile(List<String> lines){
-		Path file = Paths.get(path+frameNumber+".xyz");
+	private void writeFile(List<String> lines) {
+		Path file = Paths.get(path + frameNumber + ".xyz");
 		frameNumber++;
 		try {
 			Files.write(file, lines);

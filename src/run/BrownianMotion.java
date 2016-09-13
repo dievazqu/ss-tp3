@@ -33,9 +33,12 @@ public class BrownianMotion {
 	public static Statistics stats;
 
 	public static void main(String[] args) {
-		stats = new Statistics();
- 		new BrownianMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 23456, false, 400);
- 		stats.printStats();
+//		for(int i=0 ; i<28 ; i++) {
+			stats = new Statistics();
+	 		new BrownianMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 4*14, true, 400);
+//	 		stats.printStats();
+//		}
+ 		
 	}
 	
 	private final double bigRadius;
@@ -56,6 +59,7 @@ public class BrownianMotion {
 	private double time;
 
 	public void run() {
+		double speedMax = 0.0;
 		OutputXYZFilesGenerator outputXYZFilesGenerator = new OutputXYZFilesGenerator("animation/", "state");
 	//	OutputFileGenerator outputFileGenerator = new OutputFileGenerator("animation/", "output"+seed);
 		List<Particle> particles = createParticles(N, false);
@@ -78,6 +82,7 @@ public class BrownianMotion {
 			dt = Double.MAX_VALUE;
 			for (int i = 0; i < N; i++) {
 				Particle p = particles.get(i);
+				speedMax = Math.max(speedMax, p.getSpeed());
 				auxTime = Particle.timeToCollideHorizontalWall(0, L, p);
 				if (auxTime < dt) {
 					dt = auxTime;
@@ -127,11 +132,12 @@ public class BrownianMotion {
 				}
 			} else {
 				Particle.particlesCollide(collider, toCollide);
-				stats.adddt(dt);
+//				stats.adddt(dt);
 			//	outputFileGenerator.addLine(Double.toString(time));
 			}
 		}
 		//outputFileGenerator.writeFile();
+		System.out.println(speedMax);
 	}
 
 	public List<Particle> createParticles(int N, boolean centerBigParticle) {
