@@ -4,24 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Particle;
-import utils.OutputFileGenerator;
 import utils.OutputXYZFilesGenerator;
 import utils.RandomUtils;
 
 public class BrownianMotion {
 	
 	public static void main(String[] args) {
- 		new BrownianMotion(0.05, 0.005, 0.1, 0.0001, 0.5, 0, 0.1, 5, 60, 23456, true, 300);
- 		//new BrownianMotion(0.05, 0.005, 0.1, 0.0001, 0.5, -0.1, 0.1, 5, 60, 23456, true, 200);
+ 		new BrownianMotion(0.05, 0.005, 0.1, 0.0001, true, 0.5, 0, 0.1, 5, 60, 23456, true, 300);
 	}
 	
-	public BrownianMotion(double bigRadius, double smallRadius, double bigMass, double smallMass, double l, double minV,
+	public BrownianMotion(double bigRadius, double smallRadius, double bigMass, double smallMass, boolean centerBigParticle, double l, double minV,
 			double maxV, int maxErrors, int fps, int seed, boolean print, int N) {
 		super();
 		this.bigRadius = bigRadius;
 		this.smallRadius = smallRadius;
 		this.bigMass = bigMass;
 		this.smallMass = smallMass;
+		this.centerBigParticle = centerBigParticle;
 		L = l;
 		this.minV = minV;
 		this.maxV = maxV;
@@ -42,6 +41,7 @@ public class BrownianMotion {
 	private final double smallRadius;
 	private final double bigMass;
 	private final double smallMass;
+	private final boolean centerBigParticle;
 	private final double L;
 	private final double minV;
 	private final double maxV;
@@ -58,7 +58,7 @@ public class BrownianMotion {
 	public void run() {
 		double speedMax = 0.0;
 		OutputXYZFilesGenerator outputXYZFilesGenerator = new OutputXYZFilesGenerator("animation/", "state");
-		List<Particle> particles = createParticles(N, false);
+		List<Particle> particles = createParticles(N, centerBigParticle);
 		time = 0;
 		int N = particles.size();
 		System.out.println("N: "+N);
@@ -128,6 +128,8 @@ public class BrownianMotion {
 				Particle.particlesCollide(collider, toCollide);
 			}
 		}
+		
+		System.out.println("Max speed: "+speedMax);
 	}
 
 	public List<Particle> createParticles(int N, boolean centerBigParticle) {

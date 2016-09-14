@@ -1,9 +1,7 @@
 package utils;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -15,9 +13,7 @@ public class OutputXYZFilesGenerator {
 
 	private int frameNumber;
 	private String path;
-	private final String RED = "1 0 0";
-	private final String BLUE = "0 0 1";
-	private double maxSpeed = 0.2;
+	private double maxSpeed = 5.6;
 
 	public OutputXYZFilesGenerator(String directory, String file) {
 		frameNumber = 0;
@@ -39,21 +35,21 @@ public class OutputXYZFilesGenerator {
 		lines.add("0 0.5 0.5 0 0 0 0 0 0 1 0");
 		for (Particle p : particles) {
 			if (p.getId() == 1) {
-				lines.add(getInfo(p, "1 " + getGreen(p) + " 0", 1));
+				lines.add(getInfo(p, "1 " + getGreen(p) + " 0", 0.5, 1));
 			} else {
-				lines.add(getInfo(p, "0 " + getGreen(p) + " 1", 0));
+				lines.add(getInfo(p, "0 " + getGreen(p) + " 1", 0, 0));
 			}
 		}
 		writeFile(lines);
 	}
 
 	private String getGreen(Particle p) {
-		return Double.toString(p.getSpeed()/maxSpeed);
+		return Double.toString(p.getSpeed() / maxSpeed);
 	}
 
-	private String getInfo(Particle p, String color, int selection) {
+	private String getInfo(Particle p, String color, double transparency, int selection) {
 		return p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getXVelocity() + " " + p.getYVelocity() + " "
-				+ p.getRadius() + " " + color + " 0.5 " + selection;
+				+ p.getRadius() + " " + color + " " + transparency + " " + selection;
 	}
 
 	private void writeFile(List<String> lines) {

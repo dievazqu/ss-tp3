@@ -7,8 +7,6 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import model.Particle;
-
 public class OutputFileGenerator {
 	
 	private String path;
